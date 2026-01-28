@@ -1,34 +1,37 @@
 from src.downloader import run_download
-from src.geocoder import get_coordinates
+from src.geocoder import get_coordinates2
+from src.processor import process_all
 import sys
 
-# TARGET_YEAR = "2025"
+TARGET_YEAR = "2025"
 TARGET_MONTHS = {"01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"}
 
 def main():
-    target_months = TARGET_MONTHS # Local variable for easier potential future modification
+    target_months = TARGET_MONTHS
     while True:
         print("\n--- MENU ---")
         print("1. Download dados")
-        print("2. Sair")
+        print("2. Processar dados (.grib -> .csv)")
+        print("3. Sair")
         
         choice = input("Escolha uma opção: ")
         
         if choice == "1":
             local = input("Introduza a localidade (Enter para Viseu): ")
-
-            print("Introduza o ano dos dados: (se vazio, assume 2025)")
-            TARGET_YEAR = input()
             
-            if not TARGET_YEAR.strip():
-                TARGET_YEAR = "2025"
+            print("Introduza o ano dos dados: (se vazio, assume 2025)")
+            year_input = input()
+            
+            if not year_input.strip():
+                current_year = "2025"
+            else:
+                current_year = year_input.strip()
             
             lat = None
             lon = None
 
             if not local.strip():
                 print("Localidade vazia. A assumir Viseu.")
-                # Coordenadas default de Viseu se vazio
                 lat, lon = 40.66, -7.91
             else:
                 coords = get_coordinates(local)
@@ -36,7 +39,6 @@ def main():
                     lat, lon = coords
                 else:
                     print("Não foi possível obter coordenadas via API.")
-                    # Fallback opcional ou loop
                     continue
             
             if lat is not None and lon is not None:
@@ -45,7 +47,7 @@ def main():
                 print("\n--- RESUMO ---")
                 print(f"Localidade: {local_name}")
                 print(f"Coordenadas: Lat {lat}, Lon {lon}")
-                print(f"Ano: {TARGET_YEAR}")
+                print(f"Ano: {current_year}")
                 print(f"Meses: {len(target_months)} meses selecionados")
                 print("------------------------")
                 
@@ -54,15 +56,17 @@ def main():
                 if confirm.lower() == 's':
                     print(f"\nA iniciar download para {local_name}...")
                     
-                    # Convert set to sorted list to ensure deterministic order
                     sorted_months = sorted(list(target_months))
                     
                     for month in sorted_months:
-                        run_download(TARGET_YEAR, month, lat, lon)
+                        run_download(current_year, month, lat, lon)
                 else:
                     print("Operação cancelada.")
                 
         elif choice == "2":
+            process_all()
+            
+        elif choice == "3":
             print("A sair...")
             sys.exit()
         else:
