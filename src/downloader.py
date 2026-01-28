@@ -1,6 +1,6 @@
 import cdsapi
 import os
-from pedido import get_request_params
+from .pedido import get_request_params
 
 def setup_client():
     """Sets up the CDS API client using local config if available."""
