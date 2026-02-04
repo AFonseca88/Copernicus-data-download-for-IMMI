@@ -1,18 +1,28 @@
 # Copernicus CDS Data Downloader
 
-Este projeto permite fazer o download de dados do Copernicus Climate Data Store (CDS) usando a API oficial.
+Este projeto permite fazer o download de dados do Copernicus Climate Data Store (CDS) usando a API oficial, processá-los para formato Excel e convertê-los para o formato AKTerm.
+
+## Funcionalidades
+
+1.  **Download**: Descarrega dados ERA5 (reanalysis) para variáveis atmosféricas e de fluxo.
+2.  **Processamento**:
+    *   Filtra os dados grib recebidos.
+    *   Consolida ficheiros mensais num único ficheiro anual.
+    *   Gera um ficheiro **Excel (.xlsx)** com os dados combinados e alinhados temporalmente.
+3.  **Conversão AKTerm**:
+    *   Converte os dados do Excel para o formato `.akterm` usado em modelação.
+    *   Calcula variáveis derivadas como velocidade/direção do vento, classes de estabilidade e precipitação.
 
 ## Pré-requisitos
 
 1.  **Conta no Copernicus CDS**: Registe-se em [https://cds.climate.copernicus.eu/](https://cds.climate.copernicus.eu/).
 2.  **Chave de API**:
-    *   Faça login no portal CDS.
-    *   Vá à sua página de perfil.
-    *   Copie a sua `URL` e `API Key`.
-3.  **Configuração do Ficheiro `.cdsapirc`**:
-    *   O programa já criou um ficheiro `.cdsapirc` na pasta do projeto.
-    *   Abra esse ficheiro e substitua o texto `SUBSTITUA_PELO_SEU_UID:SUBSTITUA_PELA_SUA_API_KEY` pela sua chave real (ex: `12345:8b8...`).
-    *   Alternativamente, pode mover este ficheiro para a sua pasta de utilizador (`C:\Users\André Fonseca\.cdsapirc`).
+    *   Faça login no portal CDS e obtenha a sua `URL` e `API Key`.
+    *   Configure o ficheiro `.cdsapirc` na raiz do projeto com o formato:
+        ```text
+        url: https://cds.climate.copernicus.eu/api/v2
+        key: UID:API_KEY
+        ```
 
 ## Instalação
 
@@ -23,9 +33,14 @@ Este projeto permite fazer o download de dados do Copernicus Climate Data Store 
 
 ## Utilização
 
-1.  Abra o ficheiro `main.py` e ajuste os parâmetros `dataset` e `params` conforme necessário.
-    *   *Dica*: Pode gerar estes parâmetros no site do CDS usando o botão "Show API request" na página de download dos dados.
-2.  Execute o script:
-    ```bash
-    python main.py
-    ```
+Execute o script principal para aceder ao menu interativo:
+
+```bash
+python main.py
+```
+
+### Opções do Menu:
+1.  **Download dados**: Pede a localidade e ano, e descarrega os ficheiros .grib mensais.
+2.  **Processar dados GRIB (.grib -> .xlsx)**: Lê todos os ficheiros .grib da pasta `data`, processa, filtra e gera o ficheiro `data/processed/dados_finais.xlsx`.
+3.  **Processar dados AKTerm (.xlsx -> .akterm)**: Converte o ficheiro Excel gerado anteriormente para `data/processed/dados_era5.akterm`.
+4.  **Processamento Completo**: Executa sequencialmente o processamento GRIB e a conversão AKTerm.

@@ -1,20 +1,20 @@
 from geopy.geocoders import Nominatim
 from geopy.exc import GeocoderTimedOut, GeocoderServiceError
 
-def get_coordinates(place_name):
+def obter_coordenadas(nome_local):
     """
-    Returns (lat, lon) for a given place name using OpenStreetMap (Nominatim).
-    Returns None if not found or if an error occurs.
+    Retorna (lat, lon) para um nome de local dado usando OpenStreetMap (Nominatim).
+    Retorna None se não encontrado ou se ocorrer um erro.
     """
     try:
-        # User_agent is required by Nominatim policy
-        geolocator = Nominatim(user_agent="copernicus_downloader_app")
-        location = geolocator.geocode(place_name)
+        # User_agent é obrigatório pela política do Nominatim
+        geolocalizador = Nominatim(user_agent="copernicus_downloader_app")
+        localizacao = geolocalizador.geocode(nome_local)
         
-        if location:
-            return location.latitude, location.longitude
+        if localizacao:
+            return localizacao.latitude, localizacao.longitude
         else:
-            print(f"Localidade '{place_name}' não encontrada.")
+            print(f"Localidade '{nome_local}' não encontrada.")
             return None
             
     except (GeocoderTimedOut, GeocoderServiceError) as e:

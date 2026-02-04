@@ -1,72 +1,99 @@
-from src.downloader import run_download
-from src.geocoder import get_coordinates2
-from src.processor import process_all
+from src.downloader import executar_download
+from src.geocoder import obter_coordenadas
+from src.process_grib import processar_tudo
+from src.conversor_akterm import processar_dados_era5
 import sys
+import os
 
-TARGET_YEAR = "2025"
-TARGET_MONTHS = {"01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"}
+ANO_ALVO = "2025"
+MESES_ALVO = {"01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"}
 
 def main():
-    target_months = TARGET_MONTHS
+    meses_alvo = MESES_ALVO
     while True:
         print("\n--- MENU ---")
         print("1. Download dados")
-        print("2. Processar dados (.grib -> .csv)")
-        print("3. Sair")
-        
-        choice = input("Escolha uma opção: ")
-        
-        if choice == "1":
-            local = input("Introduza a localidade (Enter para Viseu): ")
-            
+        print("2. Processar dados GRIB (.grib -> .xlsx)")
+        print("3. Processar dados AKTerm (.xlsx -> .akterm)")
+        print("4. Processamento Completo (GRIB -> XLSX -> AKTerm)")
+        print("5. Sair")
+    
+        escolha = input("Escolha uma opção: ")
+    
+        if escolha == "1":
+            localidade = input("Introduza a localidade (Enter para Viseu): ")
+    
             print("Introduza o ano dos dados: (se vazio, assume 2025)")
-            year_input = input()
-            
-            if not year_input.strip():
-                current_year = "2025"
+            input_ano = input()
+    
+            if not input_ano.strip():
+                ano_atual = "2025"
             else:
-                current_year = year_input.strip()
-            
+                ano_atual = input_ano.strip()
+    
             lat = None
             lon = None
-
-            if not local.strip():
+    
+            if not localidade.strip():
                 print("Localidade vazia. A assumir Viseu.")
                 lat, lon = 40.66, -7.91
             else:
-                coords = get_coordinates(local)
+                coords = obter_coordenadas(localidade)
                 if coords:
                     lat, lon = coords
                 else:
                     print("Não foi possível obter coordenadas via API.")
                     continue
-            
+    
             if lat is not None and lon is not None:
                 # Resumo
-                local_name = local.strip() if local.strip() else 'Viseu'
+                nome_local = localidade.strip() if localidade.strip() else 'Viseu'
                 print("\n--- RESUMO ---")
-                print(f"Localidade: {local_name}")
+                print(f"Localidade: {nome_local}")
                 print(f"Coordenadas: Lat {lat}, Lon {lon}")
-                print(f"Ano: {current_year}")
-                print(f"Meses: {len(target_months)} meses selecionados")
+                print(f"Ano: {ano_atual}")
+                print(f"Meses: {len(meses_alvo)} meses selecionados")
                 print("------------------------")
-                
-                confirm = input("Deseja prosseguir com o download? (s/n): ")
-                
-                if confirm.lower() == 's':
-                    print(f"\nA iniciar download para {local_name}...")
-                    
-                    sorted_months = sorted(list(target_months))
-                    
-                    for month in sorted_months:
-                        run_download(current_year, month, lat, lon)
+    
+                confirmar = input("Deseja prosseguir com o download? (s/n): ")
+    
+                if confirmar.lower() == 's':
+                    print(f"\nA iniciar download para {nome_local}...")
+    
+                    meses_ordenados = sorted(list(meses_alvo))
+    
+                    for mes in meses_ordenados:
+                        executar_download(ano_atual, mes, lat, lon)
                 else:
                     print("Operação cancelada.")
-                
-        elif choice == "2":
-            process_all()
+    
+        elif escolha == "2":
+            processar_tudo()
+
+        elif escolha == "3":
+            xlsx_path = 'data/processed/dados_finais.xlsx'
+            if os.path.exists(xlsx_path):
+                print("A converter dados para AKTerm...")
+                processar_dados_era5(xlsx_path)
+                print("Conversão concluída.")
+            else:
+                print(f"Erro: Ficheiro {xlsx_path} não encontrado. Execute a opção 2 ou 4 primeiro.")
+
+        elif escolha == "4":
+            print("--- INICIANDO PROCESSAMENTO COMPLETO ---")
+            # Passo 1: GRIB -> XLSX
+            processar_tudo()
             
-        elif choice == "3":
+            # Passo 2: XLSX -> AKTerm
+            xlsx_path = 'data/processed/dados_finais.xlsx'
+            if os.path.exists(xlsx_path):
+                print("A processar para AKTerm...")
+                processar_dados_era5(xlsx_path)
+                print("Processamento completo concluído.")
+            else:
+                print("Erro: Falha na etapa anterior. Ficheiro Excel não gerado.")
+
+        elif escolha == "5":
             print("A sair...")
             sys.exit()
         else:

@@ -3,3 +3,5 @@ geopy
 xarray
 cfgrib
 pandas
+openpyxl
+numpy

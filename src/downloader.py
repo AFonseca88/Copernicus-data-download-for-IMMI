@@ -1,41 +1,51 @@
 import cdsapi
 import os
-from .pedido import get_request_params
+from .pedido import obter_parametros_pedido
 
-def setup_client():
-    """Sets up the CDS API client using local config if available."""
-    local_config = os.path.join(os.path.dirname(os.path.abspath(__file__)), '.cdsapirc')
-    if os.path.exists(local_config):
-        os.environ['CDSAPI_RC'] = local_config
+def configurar_cliente():
+    """Configura o cliente CDS API usando configuração local se disponível."""
+    diretorio_atual = os.path.dirname(os.path.abspath(__file__))
+    
+    # Verificar em src/
+    config_local = os.path.join(diretorio_atual, '.cdsapirc')
+    
+    # Verificar na raiz do projeto (pai de src/)
+    config_raiz = os.path.join(os.path.dirname(diretorio_atual), '.cdsapirc')
+
+    if os.path.exists(config_local):
+        os.environ['CDSAPI_RC'] = config_local
+    elif os.path.exists(config_raiz):
+        os.environ['CDSAPI_RC'] = config_raiz
+        
     return cdsapi.Client()
 
-def calculate_area(lat, lon, margin=0.1):
+def calcular_area(lat, lon, margem=0.1):
     """
-    Calculates the bounding box [North, West, South, East] with a given margin.
+    Calcula a caixa delimitadora [Norte, Oeste, Sul, Este] com uma margem dada.
     """
-    return [lat + margin, lon - margin, lat - margin, lon + margin]
+    return [lat + margem, lon - margem, lat - margem, lon + margem]
 
-def run_download(year, month, lat, lon):
+def executar_download(ano, mes, lat, lon):
     """
-    Orchestrates the download process.
+    Orquestra o processo de download.
     """
-    client = setup_client()
+    cliente = configurar_cliente()
 
-    target_area = calculate_area(lat, lon)
+    area_alvo = calcular_area(lat, lon)
     
-    # Ensure output directory exists
-    output_dir = "data"
-    os.makedirs(output_dir, exist_ok=True)
+    # Garantir que o diretório de saída existe
+    diretorio_saida = "data"
+    os.makedirs(diretorio_saida, exist_ok=True)
     
-    output_file = os.path.join(output_dir, f"download_{year}_{month}.grib")
+    ficheiro_saida = os.path.join(diretorio_saida, f"download_{ano}_{mes}.grib")
     
-    dataset, params = get_request_params(year, month, target_area)
+    nome_dataset, parametros = obter_parametros_pedido(ano, mes, area_alvo)
     
-    print(f"Starting download for {dataset}...")
-    print(f"Output file: {output_file}")
+    print(f"A iniciar download de {nome_dataset}...")
+    print(f"Ficheiro de saída: {ficheiro_saida}")
     
     try:
-        client.retrieve(dataset, params, output_file)
-        print(f"Download complete! File saved to: {output_file}")
+        cliente.retrieve(nome_dataset, parametros, ficheiro_saida)
+        print(f"Download concluído! Ficheiro guardado em: {ficheiro_saida}")
     except Exception as e:
-        print(f"An error occurred: {e}")
+        print(f"Ocorreu um erro: {e}")
