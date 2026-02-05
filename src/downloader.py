@@ -1,6 +1,6 @@
 import cdsapi
 import os
-from .pedido import obter_parametros_pedido
+from src.pedido_ERA5 import obter_parametros_pedido
 
 def configurar_cliente():
     """Configura o cliente CDS API usando configuração local se disponível."""

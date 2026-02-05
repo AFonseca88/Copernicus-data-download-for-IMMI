@@ -42,7 +42,8 @@ def obter_parametros_pedido(ano, mes, area):
             "10m_v_component_of_wind",
             "2m_temperature",
             "total_precipitation",
-            "surface_net_solar_radiation"
+            "surface_net_solar_radiation",
+            "boundary_layer_height"
         ],
         "year": [ano_str],
         "month": [mes_str],
