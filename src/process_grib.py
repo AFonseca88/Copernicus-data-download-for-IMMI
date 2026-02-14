@@ -19,7 +19,7 @@ def processar_variaveis_atm(datasets):
     Retorna um DataFrame unificado.
     """
     nome_grupo = "Atmosferico"
-    vars_desejadas = ['t2m', 'u10', 'v10', 'tcc']
+    vars_desejadas = ['t2m', 'u10', 'v10', 'tcc', 'blh']
     print(f"\n--- A processar grupo: {nome_grupo} {vars_desejadas} ---")
     
     dfs_encontrados = []

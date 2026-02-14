@@ -39,9 +39,15 @@ def processar_dados_era5(input_xlsx):
     # Chuva (0.1 mm)
     df['prec_ak'] = (df['tp'] * 10000).round().astype(int)
 
+    # BLH (arredondar para inteiro)
+    if 'blh' in df.columns:
+        df['blh_ak'] = df['blh'].round().astype(int)
+    else:
+        df['blh_ak'] = -999 # Fallback se não existir
+
     # 3. Exportar para EXCEL
-    df_excel = df[['time', 't2m_c', 'wd_ak', 'ws_ak', 'km_class', 'prec_ak']].copy()
-    df_excel.columns = ['Data/Hora', 'Temp (C)', 'Dir Vento (deg)', 'Vel Vento (0.1 m/s)', 'Estabilidade (KM)', 'Prec (0.1 mm)']
+    df_excel = df[['time', 't2m_c', 'wd_ak', 'ws_ak', 'km_class', 'prec_ak', 'blh_ak']].copy()
+    df_excel.columns = ['Data/Hora', 'Temp (C)', 'Dir Vento (deg)', 'Vel Vento (0.1 m/s)', 'Estabilidade (KM)', 'Prec (0.1 mm)', 'BLH (m)']
     df_excel.to_excel('data/processed/dados_tratados_akterm.xlsx', index=False)
 
     # 4. Exportar para AKTerm
@@ -56,7 +62,7 @@ def processar_dados_era5(input_xlsx):
         # Estrutura de 18 colunas conforme ficheiro de exemplo
         linha = (f"AK 11111 {t.year} {t.month:02d} {t.day:02d} {t.hour:02d} 00 "
                  f"1 1 {int(row['wd_ak']):3d} {int(row['ws_ak']):3d} "
-                 f"1 {int(row['km_class'])} 1 -999 9 {int(row['prec_ak']):3d} 1")
+                 f"1 {int(row['km_class'])} 1 {int(row['blh_ak']):3d} 9 {int(row['prec_ak']):3d} 1")
         lines.append(linha)
 
     with open('data/processed/dados_era5.akterm', 'w') as f:
