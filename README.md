@@ -8,7 +8,7 @@ Este projeto permite fazer o download de dados do Copernicus Climate Data Store 
 2.  **Processamento**:
     *   Filtra os dados grib recebidos.
     *   Consolida ficheiros mensais num único ficheiro anual.
-    *   Gera um ficheiro **Excel (.xlsx)** com os dados combinados e alinhados temporalmente.
+    *   Gera um ficheiro **Excel (.xlsx)** com os dados anuais.
 3.  **Conversão AKTerm**:
     *   Converte os dados do Excel para o formato `.akterm` usado em modelação.
     *   Calcula variáveis derivadas como velocidade/direção do vento, classes de estabilidade e precipitação.
@@ -92,7 +92,7 @@ O módulo `src/conversor_akterm.py` realiza as seguintes transformações:
     *   **Velocidade ($m/s$)**: $\sqrt{u10^2 + v10^2}$
     *   **Velocidade AKTerm**: Multiplicada por 10 e arredondada (formato inteiro decimétrico).
     *   **Direção**: Calculada com `atan2(-u10, -v10)` para obter a direção *de onde* sopra o vento (meteorológica). Convertida para 0-360º.
-    *   **Calmaria**: Se a velocidade < 0.1 m/s, a direção é definida como 0.
+    *   **Calmas**: Se a velocidade < 0.1 m/s, a direção é definida como 0.
 
 3.  **Precipitação**:
     *   Convertida de metros (m) para 0.1 milímetros.
